@@ -22,6 +22,12 @@
       for (const p of players) {
         if (p.playbackState === MprisPlaybackState.Playing) return p;
       }
+      // Nothing playing: prefer a real music player over a paused browser tab,
+      // so the pill doesn't show a web page title.
+      const isBrowser = p => /firefox|chrom|brave|vivaldi|zen|librewolf/i.test(p.dbusName || "");
+      for (const p of players) {
+        if (!isBrowser(p)) return p;
+      }
       return players[0];
     }
 
