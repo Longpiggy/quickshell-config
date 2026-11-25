@@ -19,7 +19,7 @@ Rectangle {
   }
   function pct(p) { return p < 0 ? "–" : Math.round(p) + "%"; }
   function until(t) {
-    if (!t) return "–";
+    if (!t || t <= root.now) return "–";
     const s = Math.max(0, t - root.now);
     const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
     return d > 0 ? d + "d" + h + "h" : h > 0 ? h + "h" + m + "m" : m + "m";
