@@ -30,10 +30,10 @@ Singleton {
     }
   }
 
-  // Memory Usage
+  // Memory Usage (used/total xx%)
   Process {
     id: memProc
-    command: ["sh", "-c", "free | grep Mem | awk '{printf \"%.1f%%\", ($3/$2) * 100.0}'"]
+    command: ["sh", "-c", "free -b | awk '/^Mem:/ { u=($3>=1073741824)?sprintf(\"%.1fG\",$3/1073741824):sprintf(\"%.0fM\",$3/1048576); t=($2>=1073741824)?sprintf(\"%.0fG\",$2/1073741824):sprintf(\"%.0fM\",$2/1048576); printf \"%.0f%% %s/%s\", ($3/$2)*100, u, t }'"]
     running: true
 
     stdout: StdioCollector {
@@ -92,18 +92,21 @@ Singleton {
     }
   }
 
-  // Temperature
-  Process {
+// Temperature
+Process {
     id: tempProc
-    command: ["sh", "-c", "sensors 2>/dev/null | grep -E 'Package id 0|Tctl' | head -1 | awk '{print $2}' | sed 's/+//' || echo 'N/A'"]
+    command: [
+        "sh", "-c",
+        "sensors 2>/dev/null | awk '/Package id 0:/ {print $4; exit} /Tctl:/ {print $2; exit}' | sed 's/+//' || echo 'N/A'"
+    ]
     running: true
 
     stdout: StdioCollector {
-      onStreamFinished: {
-        root.temperature = text.trim() || "N/A"
-      }
+        onStreamFinished: {
+            root.temperature = text.trim() || "N/A"
+        }
     }
-  }
+}
 
   // Update timer
   Timer {
