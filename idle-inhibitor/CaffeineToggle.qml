@@ -7,7 +7,8 @@ Scope {
   id: root
   property var theme: DefaultTheme {}
   property string font: "Hack Nerd Font"
-  property bool active: false
+  // State lives in the singleton so the bar pill and the IPC handler share it.
+  readonly property bool active: Caffeine.active
   property bool showBadge: false
 
   onActiveChanged: {
@@ -25,15 +26,15 @@ Scope {
     target: "idle"
 
     function toggle(): void {
-      root.active = !root.active;
+      Caffeine.toggle();
     }
 
     function enable(): void {
-      root.active = true;
+      Caffeine.active = true;
     }
 
     function disable(): void {
-      root.active = false;
+      Caffeine.active = false;
     }
   }
 
@@ -95,8 +96,11 @@ Scope {
 
       MouseArea {
         anchors.fill: parent
+        // Only clickable while visible; otherwise this is an invisible
+        // hotspot in the screen corner.
+        enabled: root.showBadge
         cursorShape: Qt.PointingHandCursor
-        onClicked: root.active = !root.active
+        onClicked: Caffeine.toggle()
       }
     }
   }

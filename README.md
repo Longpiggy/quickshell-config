@@ -26,7 +26,7 @@ https://github.com/user-attachments/assets/55c47c05-34b6-402c-aea7-42a369b86828
 | **Theme Switcher** | 206 themes across 6 families, persists across restarts, or follow your wallpaper |
 | **Wallpaper Manager** | grid picker for wallpapers, preview, supports hyprpaper and swww |
 | **Monitor Manager** | visual `hyprctl` front-end for arranging, scaling, rotating, mirroring, and disabling displays |
-| **Caffeine Toggle** | keeps the screen from locking or dimming while it's on - a corner badge you switch on for stretches where you're reading more than typing |
+| **Caffeine Toggle** | keeps the screen from locking or dimming while it's on - a coffee-cup button next to the clock on the bar |
 
 ## prerequisites
 
@@ -277,7 +277,7 @@ features:
 
 ### caffeine toggle
 
-a small toggle that keeps the screen from locking or dimming while it's switched on. i added this for the stretches where i'm mostly reading rather than typing (vibe-coding?) - long enough that the lock screen would otherwise kick in when i'd rather it didn't. it shows up as a small badge in the corner only while it's active, so the rest of the time it's out of the way.
+a small toggle that keeps the screen from locking or dimming while it's switched on. i added this for the stretches where i'm mostly reading rather than typing (vibe-coding?) - long enough that the lock screen would otherwise kick in when i'd rather it didn't. it lives on the bar as a coffee cup right next to the clock: muted while sleep is allowed, filled with the theme accent while it's holding the screen awake.
 
 no extra dependencies - it wraps Quickshell's own `IdleInhibitor` type, which talks directly to the Wayland `idle-inhibit` protocol Hyprland already supports. nothing external to install or accidentally leave running.
 
@@ -290,15 +290,30 @@ import "idle-inhibitor"
 CaffeineToggle {}
 ```
 
-3. bind a key in `hyprland.conf`:
+3. in your bar, add the cup next to the clock:
+
+```qml
+import "../idle-inhibitor"
+
+CaffeinePill {
+  theme: root.theme
+  font: root.font
+  anchors.left: timePill.right
+  anchors.leftMargin: 6
+  anchors.verticalCenter: timePill.verticalCenter
+}
+```
+
+4. optionally bind a key in `hyprland.conf`:
 
 ```
 bind = SUPER, C, exec, qs ipc call idle toggle
 ```
 
 features:
-- corner badge that fades in only while active, and fades back out a couple seconds after you toggle it
-- click the badge to turn it off without reaching for the keybind
+- coffee-cup pill next to the clock: muted when off, accent-filled while sleep is inhibited
+- click the cup to toggle it, `qs ipc call idle toggle` does the same thing
+- the corner badge still flashes for a couple of seconds after a toggle, so the keybind gives you the same feedback
 - deliberately doesn't persist across restarts - i'd rather re-toggle it once in a while than have a shell crash quietly leave the screen from sleeping forever
 
 ## tweaking
